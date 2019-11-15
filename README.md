@@ -113,7 +113,7 @@ plt.legend(bbox_to_anchor=(1,1))
 
 
 
-    <matplotlib.legend.Legend at 0x112b01198>
+    <matplotlib.legend.Legend at 0x28bb92e9898>
 
 
 
@@ -129,7 +129,7 @@ Write a function **rss(m)** which calculates the residual sum of squares for a s
 
 ```python
 def rss(m, X=df.budget, y=df.domgross):
-    pass
+    return sum((y-m*X)**2)
 ```
 
 ## Run your RSS function on the two models
@@ -137,13 +137,17 @@ Which of the two models is better?
 
 
 ```python
-# Your code here
+slopes = [1.575, 1.331]
+for m in slopes:
+    print (rss(m), '  ', m)
+
 ```
 
+    2.7614512142376128e+17    1.575
+    2.3547212057814554e+17    1.331
+    
 
-```python
-# Your response here
-```
+The slope (1.331) the lower RSS.
 
 ## Gradient Descent
 
@@ -162,43 +166,80 @@ To start, visualize the cost function. Plot the cost function output for a range
 
 
 ```python
-# Your code here
+step = 10
+slopes = np.array(list(range(-3* step, 5* step+ 1)))/step
+RSS = [rss(m) for m in slopes]
+plt.figure(figsize=(13, 8))
+
+plt.title('RSS for m Values')
+plt.plot(slopes, RSS)
 ```
+
+
+
+
+    [<matplotlib.lines.Line2D at 0x28bbb914e80>]
+
+
+
+
+![png](index_files/index_11_1.png)
+
 
 As you can see, this is a simple cost function. The minimum is clearly around 1. With that, it's time to implement gradient descent in order to find the optimal value for m.
 
 
 ```python
-cur_x = #Set a starting point
-alpha = #Initialize a step size
+cur_x = 1 #Set a starting point
+alpha = 1*10**(-8)  #Initialize a step size
 precision = 0.0000001 #Initialize a precision
 previous_step_size = 1 #Helpful initialization
-max_iters = 10000 # maximum number of iterations
+max_iters = 100000 # maximum number of iterations
 iters = 0 #iteration counter
 
 #Create a loop to iterate through the algorithm until either the max_iteration or precision conditions is met
+
 #Your code here; create a loop as described above
+while (previous_step_size > precision) & (iters < max_iters):
+    print('Current value: {} RSS Produced: {}'.format(cur_x, rss(cur_x)))
+    prev_x = cur_x
     #Calculate the gradient. This is often done by hand to reduce computational complexity.
     #For here, generate points surrounding your current state, then calculate the rss of these points
     #Finally, use the np.gradient() method on this survey region. This code is provided here to ease this portion of the algorithm implementation
     x_survey_region = np.linspace(start = cur_x - previous_step_size , stop = cur_x + previous_step_size , num = 101)
     rss_survey_region = [np.sqrt(rss(m)) for m in x_survey_region]
     gradient = np.gradient(rss_survey_region)[50] 
-    
-    #Update the current x, by taking an "alpha sized" step in the direction of the gradient
+    cur_x -= alpha * gradient #Move opposite the gradient
+    previous_step_size = abs(cur_x - prev_x)
+    iters+=1
 
-    #Update the iteration number
-
+print("The local minimum occurs at", cur_x)
 #The output for the above will be: ('The local minimum occurs at', 1.1124498053361267)
 ```
+
+    Current value: 1 RSS Produced: 222288260290116585
+    Current value: 1.0070399504409644 RSS Produced: 2.2206548174535312e+17
+    Current value: 1.0070849051799788 RSS Produced: 2.2206412942768304e+17
+    Current value: 1.007085192057355 RSS Produced: 2.220641208007702e+17
+    The local minimum occurs at 1.007085193888047
+    
 
 ## Plot the minimum on your graph
 Replot the RSS cost curve as above. Add a red dot for the minimum of this graph using the solution from your gradient descent function above.
 
 
 ```python
-# Your code here
+plt.figure(figsize=(13, 8));
+plt.title('RSS for m Values');
+plt.plot(slopes, RSS, label='Gradient Descent Function');
+plt.scatter(cur_x, rss(cur_x), color='red', label= 'Solution');
+plt.xlabel('Slopes')
+plt.legend();
 ```
+
+
+![png](index_files/index_15_0.png)
+
 
 ## Summary 
 
